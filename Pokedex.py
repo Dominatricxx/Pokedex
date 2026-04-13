@@ -39,7 +39,7 @@ class Pokemon(PokemonBase):
         self.nivel = 1
 
     def hablar(self):
-        print(self.nombre + "!!!")
+        print(f"{self.nombre}!")
 
     def actualizar(self):
         if self.nivel >= 100 and self.evolucion < 3:
@@ -49,17 +49,17 @@ class Pokemon(PokemonBase):
                 self.nombre = "Pikachu"
             elif self.evolucion == 3:
                 self.nombre = "Raichu"
-            print("¡El Pokémon ha evolucionado! Ahora es:", self.nombre)
+            print(f"El Pokémon ha evolucionado! Ahora es: {self.nombre}")
 
     def detallesPokemon(self):
-        print("Nombre:", self.nombre)
-        print("Descripción:", self.descripcion)
-        print("Ataque:", self.ataque)
-        print("Defensa:", self.defensa)
-        print("Vida:", self.vida)
-        print("Nivel:", self.nivel)
-        print("Evolución:", self.evolucion)
-        print("Atrapado:", self.atrapado)
+        print(f"Nombre: {self.nombre}")
+        print(f"Descripción: {self.descripcion}")
+        print(f"Ataque: {self.ataque}")
+        print(f"Defensa: {self.defensa}")
+        print(f"Vida: {self.vida}")
+        print(f"Nivel: {self.nivel}")
+        print(f"Evolución: {self.evolucion}")
+        print(f"Atrapado: {self.atrapado}")
 
     def entrenar(self):
         self.ataque += 10
@@ -82,16 +82,16 @@ pokemon_principal = Pokemon("Pichu", "Un Pokémon eléctrico pequeño")
 pokemones_atrapados = []
 
 while True:
-    print("\n--- POKEDEX ---")
-    print("1. Ver detalles")
-    print("2. Hablar")
-    print("3. Entrenar")
-    print("4. Subir ataque")
-    print("5. Subir defensa")
-    print("6. Subir vida")
-    print("7. Atrapar Pokémon")
-    print("8. Ver Pokémon atrapados")
-    print("9. Salir")
+    print("\n--- POKEDEX ---\n"
+          "[1] Ver detalles\n"
+          "[2] Hablar\n"
+          "[3] Entrenar\n"
+          "[4] Subir ataque\n"
+          "[5] Subir defensa\n"
+          "[6] Subir vida\n"
+          "[7] Atrapar Pokémon\n"
+          "[8] Ver Pokémon atrapados\n"
+          "[9] Salir")
 
     opcion = input("Elige una opción: ")
 
