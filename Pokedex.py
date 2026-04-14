@@ -369,7 +369,14 @@ def combate(mi_pokemon, enemigos, atrapados):
             return
 
         if mi_pokemon.vida <= 0:
-            print(f"\n{mi_pokemon.nombre} ha sido derrotado\n")
+            print(
+                f"\n{mi_pokemon.nombre} ha sido derrotado.\n"
+                f"Fue necesario llevarlo al centro pokemon.\n"
+                "Despues de recibir atencion, ha vuelto a la normalidad y esta listo para regresar al campo.\n"
+            )
+
+            input("Presiona ENTER para continuar...")
+
             return
 
 
