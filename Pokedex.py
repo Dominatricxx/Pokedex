@@ -65,13 +65,12 @@ class Pokemon(PokemonBase):
         self.nivel = 0
 
     def hablar(self):
-        print(f"\n¡{self.nombre}!")
+        print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!")
 
     def actualizar(self):
         if self.nivel >= 100 and self.evolucion < 3:
             self.evolucion += 1
             self.nivel = 0
-
             if self.evolucion == 2:
                 self.nombre = "Pikachu"
             elif self.evolucion == 3:
