@@ -262,6 +262,9 @@ class PokemonAgua(PokemonConEntrenamiento):
     def __init__(self, nombre):
         super().__init__(nombre, "Tipo Agua")
         self.ataque_especial = "Hidrobomba"
+        self.ataque = 20
+        self.defensa = 30
+        self.vida = 35
 
     def actualizar(self):
         if self.nivel >= 100 and self.evolucion < 3:
@@ -276,6 +279,9 @@ class PokemonFuego(PokemonConEntrenamiento):
     def __init__(self, nombre):
         super().__init__(nombre, "Tipo Fuego")
         self.ataque_especial = "Lanzallamas"
+        self.ataque = 45
+        self.defensa = 60
+        self.vida = 50
 
     def actualizar(self):
         if self.nivel >= 100 and self.evolucion < 3:
@@ -290,6 +296,9 @@ class PokemonElectrico(PokemonConEntrenamiento):
     def __init__(self, nombre):
         super().__init__(nombre, "Tipo Eléctrico")
         self.ataque_especial = "Impactrueno"
+        self.ataque = 40
+        self.defensa = 50
+        self.vida = 70
 
     def actualizar(self):
         if self.nivel >= 100 and self.evolucion < 3:
@@ -304,6 +313,9 @@ class PokemonHierba(PokemonConEntrenamiento):
     def __init__(self, nombre):
         super().__init__(nombre, "Tipo Hierba")
         self.ataque_especial = "Látigo Cepa"
+        self.ataque = 24
+        self.defensa = 32
+        self.vida = 44
 
     def actualizar(self):
         if self.nivel >= 100 and self.evolucion < 3:
@@ -317,22 +329,20 @@ class PokemonHierba(PokemonConEntrenamiento):
 def aplicar_danio(atacante, defensor):
     dano = atacante.ataque
 
-    if defensor.defensa >= dano:
-        defensor.defensa -= dano
-    else:
-        restante = dano - defensor.defensa
-        defensor.defensa = 0
-        defensor.vida = max(0, defensor.vida - restante)
+    dano_defensa = min(defensor.defensa, dano)
+    defensor.defensa -= dano_defensa
+
+    dano_vida = dano - dano_defensa
+    defensor.vida = max(0, defensor.vida - dano_vida)
 
 def aplicar_danio_especial(atacante, defensor):
     dano = atacante.ataque * 2
 
-    if defensor.defensa >= dano:
-        defensor.defensa -= dano
-    else:
-        restante = dano - defensor.defensa
-        defensor.defensa = 0
-        defensor.vida = max(0, defensor.vida - restante)
+    dano_defensa = min(defensor.defensa, dano)
+    defensor.defensa -= dano_defensa
+
+    dano_vida = dano - dano_defensa
+    defensor.vida = max(0, defensor.vida - dano_vida)
 
 
 def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
@@ -341,14 +351,19 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
     enemigo = random.choice(enemigos)
     rival = random.choice(rivales)
 
+    defensa_enemigo_antes = enemigo.defensa
+    vida_enemigo_antes = enemigo.vida
+    vida_antes = mi_pokemon.vida
+    defensa_antes = mi_pokemon.defensa
+
     print(f"Entrenador rival [{rival}]: ¡{enemigo.nombre}, adelante!"
           f"\nCombate iniciado contra {enemigo.nombre}\n")
-
+    
     while mi_pokemon.vida > 0 and enemigo.vida > 0:
-        defensa_enemigo_antes = enemigo.defensa
-        vida_enemigo_antes = enemigo.vida
-        vida_antes = mi_pokemon.vida
-        defensa_antes = mi_pokemon.defensa
+        defensa_enemigo_turno = enemigo.defensa
+        vida_enemigo_turno = enemigo.vida
+        defensa_mi_turno = mi_pokemon.defensa
+        vida_mi_turno = mi_pokemon.vida
 
         print(
             f"\nTu Pokémon: {mi_pokemon.nombre} | ATK:{mi_pokemon.ataque} DEF:{mi_pokemon.defensa} VIDA:{mi_pokemon.vida}\n"
@@ -371,8 +386,8 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
            
             aplicar_danio(mi_pokemon, enemigo)
 
-            dano_defensa = max(0, defensa_enemigo_antes - enemigo.defensa)
-            dano_vida = max(0, vida_enemigo_antes - enemigo.vida)
+            dano_defensa = defensa_enemigo_turno - enemigo.defensa
+            dano_vida = vida_enemigo_turno - enemigo.vida
             dano_total = dano_defensa + dano_vida
 
             print(f"\n{mi_pokemon.nombre} usó ATAQUE NORMAL\n"
@@ -382,9 +397,9 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
 
         elif opcion == "3":
             aplicar_danio_especial(mi_pokemon, enemigo)
-
-            dano_defensa = max(0, defensa_enemigo_antes - enemigo.defensa)
-            dano_vida = max(0, vida_enemigo_antes - enemigo.vida)
+            
+            dano_defensa = defensa_enemigo_turno - enemigo.defensa
+            dano_vida = vida_enemigo_turno - enemigo.vida
             dano_total = dano_defensa + dano_vida
 
             print(f"\n{mi_pokemon.nombre} usó {mi_pokemon.ataque_especial}\n"
@@ -395,10 +410,25 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
 
         elif opcion == "4":
             print(f"\n{mi_pokemon.nombre} huyó del combate")
+            enemigo.defensa = defensa_enemigo_antes
+            enemigo.vida = vida_enemigo_antes
+            mi_pokemon.defensa = defensa_antes
+            mi_pokemon.vida = vida_antes
+
+            input("Presiona [ENTER] para regresar al menú.")
             return
 
         if enemigo.vida <= 0:
-            print(f"\n{enemigo.nombre} fue derrotado\n"
+            print(f"\n{enemigo.nombre} fue derrotado\n")
+
+            mi_pokemon.nivel += 2
+            enemigo.defensa = defensa_enemigo_antes
+            enemigo.vida = vida_enemigo_antes
+            mi_pokemon.defensa = defensa_antes
+            mi_pokemon.vida = vida_antes
+            
+            print(f"===== ¡Felicidades! tu pokemon a subido al nivel {mi_pokemon.nivel} =====\n\n"
+
                   f"¿Desea capturar al pokemon {enemigo.nombre}?\n"
                   f"[1] Sí\n"
                   f"[2] No\n")
@@ -406,7 +436,9 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
             decision = input("Elige: ")
 
             if decision == "2":
-                print(f"\n{enemigo.nombre} se fue del combate")
+                print(f"\n{enemigo.nombre} se fue del combate.\n")
+                
+                input("Presiona [ENTER] para regresar al menú.")
                 return
 
             elif decision == "1":
@@ -417,19 +449,9 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
                     atrapados.append(enemigo)
                     print(f"\n{enemigo.nombre} fue atrapado.\n")
 
-                    enemigo.defensa = defensa_enemigo_antes
-                    enemigo.vida = vida_enemigo_antes
-                    mi_pokemon.defensa = defensa_antes
-                    mi_pokemon.vida = vida_antes
-
                     input("Presiona [ENTER] para regresar al menú.")
                 else:
                     print(f"\nEl pokemon {enemigo.nombre} no pudo ser capturado y escapó.\n")
-
-                    enemigo.defensa = defensa_enemigo_antes
-                    enemigo.vida = vida_enemigo_antes
-                    mi_pokemon.defensa = defensa_antes
-                    mi_pokemon.vida = vida_antes
 
                     input("Presiona [ENTER] para regresar al menú.")
                 return
@@ -442,8 +464,8 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
         elif accion == "normal":
             aplicar_danio(enemigo, mi_pokemon)
 
-            dano_defensa = max(0, defensa_antes - mi_pokemon.defensa)
-            dano_vida = max(0, vida_antes - mi_pokemon.vida)
+            dano_defensa = defensa_mi_turno - mi_pokemon.defensa
+            dano_vida = vida_mi_turno - mi_pokemon.vida
             dano_total = dano_defensa + dano_vida
 
             print(f"\n{enemigo.nombre} usó ATAQUE NORMAL\n"
@@ -454,8 +476,8 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
         elif accion == "especial":
             aplicar_danio_especial(enemigo, mi_pokemon)
 
-            dano_defensa = max(0, defensa_antes - mi_pokemon.defensa)
-            dano_vida = max(0, vida_antes - mi_pokemon.vida)
+            dano_defensa = defensa_mi_turno - mi_pokemon.defensa
+            dano_vida = vida_mi_turno - mi_pokemon.vida
             dano_total = dano_defensa + dano_vida
 
             print(f"\n{enemigo.nombre} usó {enemigo.ataque_especial}\n"
@@ -470,6 +492,7 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
             mi_pokemon.defensa = defensa_antes
             mi_pokemon.vida = vida_antes
 
+            input("Presiona [ENTER] para regresar al menú.")
             return
 
         if mi_pokemon.vida <= 0:
@@ -497,7 +520,7 @@ def verPokemonsAtrapados(lista, principal):
 
 def crear_enemigo():
     print(
-        "===== Elige su tipo =====\n"
+        "\n===== Elige su tipo =====\n"
         "[1] Agua\n"
         "[2] Fuego\n"
         "[3] Electrico\n"
