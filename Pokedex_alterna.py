@@ -89,11 +89,11 @@ class Pokemon(PokemonBase):
 
                 elif self.nivel == 100 and indice == len(linea) - 1:
                     print(f"\n¡{self.nombre} ha alcanzado su máximo nivel!\n")
-                    break
+                break
 
     def detallesPokemon(self):
         print(
-            f"===== DETALLES DEL POKEMON =====\n"
+            f"\n===== DETALLES DEL POKEMON =====\n"
             f"Nombre: {self.nombre}\n"
             f"Descripción: {self.descripcion}\n"
             f"Ataque: {self.ataque}\n"
@@ -241,6 +241,7 @@ class Pokemon(PokemonBase):
             print("========================================\n")
 
             input("Presiona [Enter] para regresar al menú de entrenamientos.")
+            self.detallesPokemon()
 
 
     def subirAtaque(self):
@@ -269,9 +270,6 @@ class PokemonAgua(PokemonConEntrenamiento):
             self.vida += 10
 
         super().actualizar()
-
-     
-          
 
 
 class PokemonFuego(PokemonConEntrenamiento):
@@ -302,7 +300,6 @@ class PokemonElectrico(PokemonConEntrenamiento):
         super().actualizar()
 
 
-
 class PokemonHierba(PokemonConEntrenamiento):
     def __init__(self, nombre):
         super().__init__(nombre, "Tipo Hierba")
@@ -315,7 +312,6 @@ class PokemonHierba(PokemonConEntrenamiento):
             self.vida += 15
 
         super().actualizar()
-
 
 
 def aplicar_danio(atacante, defensor):
@@ -339,10 +335,14 @@ def aplicar_danio_especial(atacante, defensor):
         defensor.vida = max(0, defensor.vida - restante)
 
 
-def combate(mi_pokemon, enemigos, atrapados):
-    enemigo = random.choice(enemigos)
+def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
+    print(f"\n{nombre_usuario}: ¡{mi_pokemon.nombre} yo te elijo!\n")
 
-    print(f"\nCombate iniciado contra {enemigo.nombre}")
+    enemigo = random.choice(enemigos)
+    rival = random.choice(rivales)
+
+    print(f"Entrenador rival [{rival}]: ¡{enemigo.nombre}, adelante!"
+          f"\nCombate iniciado contra {enemigo.nombre}\n")
 
     while mi_pokemon.vida > 0 and enemigo.vida > 0:
         defensa_enemigo_antes = enemigo.defensa
@@ -473,7 +473,10 @@ def combate(mi_pokemon, enemigos, atrapados):
             return
 
         if mi_pokemon.vida <= 0:
-            print(f"\n{mi_pokemon.nombre} ha sido derrotado\n")
+            print(
+                f"\n{mi_pokemon.nombre} ha sido derrotado.\n"
+                f"Fue necesario llevarlo al centro pokemon.\n"
+                "Después de recibir atención, ha vuelto a la normalidad y esta listo para regresar al campo.\n")
 
             enemigo.defensa = defensa_enemigo_antes
             enemigo.vida = vida_enemigo_antes
@@ -519,6 +522,14 @@ def crear_enemigo():
 
     return p
 
+print("\n===== BIENVENIDO ENTRENADOR =====\n")
+nombre_usuario = input("Por favor, ingresa tu nombre: ")
+
+print(f"\nBienvenido {nombre_usuario}.\n"
+      f"Actualmente no tienes ningún pokemon en tu posesión.\n")
+
+input("Por favor procede con [ENTER] para seleccionar uno.")
+limpiarPantalla()
 
 print(
     "\n¡BIENVENIDO A LA POKEDEX!\n"
@@ -530,8 +541,6 @@ print(
 )
 
 op = input("Opción: ")
-print()
-
 
 if op == "1":
     pokemon_principal = PokemonAgua("Squirtle")
@@ -541,6 +550,9 @@ elif op == "3":
     pokemon_principal = PokemonElectrico("Pichu")
 else:
     pokemon_principal = PokemonHierba("Bulbasaur")
+
+pokemon_principal.detallesPokemon()
+input("Presiona [ENTER] para continuar al menú principal...")
 
 enemigos = [
     PokemonFuego("Charmander"),
@@ -582,7 +594,11 @@ while True:
 
     elif opcion == "4":
         limpiarPantalla()
-        combate(pokemon_principal, enemigos, pokemones_atrapados)
+        rivales = [
+            "Gary Oak", 
+            "Paul"]
+        
+        combate(pokemon_principal, enemigos, pokemones_atrapados, nombre_usuario, rivales)
 
     elif opcion == "5":
         verPokemonsAtrapados(pokemones_atrapados, pokemon_principal)
