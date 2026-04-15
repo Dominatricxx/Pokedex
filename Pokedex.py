@@ -66,6 +66,8 @@ class Pokemon(PokemonBase):
         self.defensa = 50
         self.vida = 50
         self.nivel = 0
+        self.evolucion = 1
+        self.atrapado = True
 
     def hablar(self):
         print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!")
@@ -117,7 +119,11 @@ class Pokemon(PokemonBase):
             if opcion == "1":
                 self.ataque += 10
                 self.defensa += 10
-                self.nivel += 10
+
+                if self.nivel == 100:
+                    self.nivel = self.nivel
+                else:
+                    self.nivel += 10
 
             elif opcion == "2":
 
@@ -224,7 +230,7 @@ class Pokemon(PokemonBase):
                 print(f"Nivel: {nivel_antes} → {self.nivel} (+{self.nivel})")
 
             print("========================================\n")
-
+            input("Presiona [Enter] para regresar al menú de entrenamientos.")
             self.detallesPokemon()
 
     def subirAtaque(self):
@@ -249,10 +255,12 @@ class PokemonAgua(PokemonConEntrenamiento):
     def actualizar(self):
         super().actualizar()
 
-        if self.evolucion > 1:
+        if self.nivel >= 100 and self.evolucion < 3:
             self.ataque += 15
             self.defensa += 10
             self.vida += 10
+
+        super().actualizar()
 
 
 class PokemonFuego(PokemonConEntrenamiento):
@@ -261,12 +269,12 @@ class PokemonFuego(PokemonConEntrenamiento):
         self.ataque_especial = "Lanzallamas"
 
     def actualizar(self):
-        super().actualizar()
-
-        if self.evolucion > 1:
+        if self.nivel >= 100 and self.evolucion < 3:
             self.ataque += 20
             self.defensa += 5
             self.vida += 10
+
+        super().actualizar()
 
 
 class PokemonElectrico(PokemonConEntrenamiento):
@@ -275,10 +283,12 @@ class PokemonElectrico(PokemonConEntrenamiento):
         self.ataque_especial = "Impactrueno"
 
     def actualizar(self):
+        if self.nivel >= 100 and self.evolucion < 3:
+            self.ataque += 18
+            self.defensa += 8
+            self.vida += 10
+
         super().actualizar()
-        self.ataque += 18
-        self.defensa += 8
-        self.vida += 10
 
 
 class PokemonHierba(PokemonConEntrenamiento):
@@ -287,14 +297,27 @@ class PokemonHierba(PokemonConEntrenamiento):
         self.ataque_especial = "Látigo Cepa"
 
     def actualizar(self):
+        if self.nivel >= 100 and self.evolucion < 3:
+            self.ataque += 10
+            self.defensa += 15
+            self.vida += 15
+
         super().actualizar()
-        self.ataque += 10
-        self.defensa += 15
-        self.vida += 15
 
 
 def aplicar_danio(atacante, defensor):
     dano = atacante.ataque
+
+    if defensor.defensa >= dano:
+        defensor.defensa -= dano
+    else:
+        restante = dano - defensor.defensa
+        defensor.defensa = 0
+        defensor.vida = max(0, defensor.vida - restante)
+
+
+def aplicar_danio_especial(atacante, defensor):
+    dano = atacante.ataque * 2
 
     if defensor.defensa >= dano:
         defensor.defensa -= dano
@@ -314,6 +337,11 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
           f"\nCombate iniciado contra {enemigo.nombre}\n")
 
     while mi_pokemon.vida > 0 and enemigo.vida > 0:
+        defensa_enemigo_antes = enemigo.defensa
+        vida_enemigo_antes = enemigo.vida
+        vida_antes = mi_pokemon.vida
+        defensa_antes = mi_pokemon.defensa
+
         print(
             f"\nTu Pokémon: {mi_pokemon.nombre} | ATK:{mi_pokemon.ataque} DEF:{mi_pokemon.defensa} VIDA:{mi_pokemon.vida}\n"
             f"Enemigo: {enemigo.nombre} | ATK:{enemigo.ataque} DEF:{enemigo.defensa} VIDA:{enemigo.vida}\n"
@@ -337,8 +365,8 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
 
             aplicar_danio(mi_pokemon, enemigo)
 
-            dano_defensa = max(0, defensa_antes - enemigo.defensa)
-            dano_vida = max(0, vida_antes - enemigo.vida)
+            dano_defensa = max(0, defensa_enemigo_antes - enemigo.defensa)
+            dano_vida = max(0, vida_enemigo_antes - enemigo.vida)
             dano_total = dano_defensa + dano_vida
 
             print(f"\n{mi_pokemon.nombre} usó ATAQUE NORMAL\n"
@@ -347,11 +375,17 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
                   f"Vida reducida: {dano_vida}\n")
 
         elif opcion == "3":
-            dano = 30
-            enemigo.vida = max(0, enemigo.vida - dano)
+            aplicar_danio_especial(mi_pokemon, enemigo)
+
+            dano_defensa = max(0, defensa_enemigo_antes - enemigo.defensa)
+            dano_vida = max(0, vida_enemigo_antes - enemigo.vida)
+            dano_total = dano_defensa + dano_vida
 
             print(f"\n{mi_pokemon.nombre} usó {mi_pokemon.ataque_especial}\n"
-                  f"Daño total: {dano}")
+                  f"Daño total: {dano_total}\n"
+                  f"Defensa reducida: {dano_defensa}\n"
+                  f"Vida reducida: {dano_vida}")
+
 
         elif opcion == "4":
             print(f"\n{mi_pokemon.nombre} huyó del combate")
@@ -370,14 +404,26 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
                 return
 
             elif decision == "1":
-                print(f"\nCapturando...")
-
                 if random.choice([True, False]):
                     enemigo.atrapado = True
                     atrapados.append(enemigo)
-                    print(f"\n{enemigo.nombre} fue atrapado")
+                    print(f"\n{enemigo.nombre} fue atrapado.\n")
+
+                    enemigo.defensa = defensa_enemigo_antes
+                    enemigo.vida = vida_enemigo_antes
+                    mi_pokemon.defensa = defensa_antes
+                    mi_pokemon.vida = vida_antes
+
+                    input("Presiona [ENTER] para regresar al menú.")
                 else:
-                    print(f"\nEl pokemon {enemigo.nombre} no pudo ser capturado y escapó")
+                    print(f"\nEl pokemon {enemigo.nombre} no pudo ser capturado y escapó.\n")
+
+                    enemigo.defensa = defensa_enemigo_antes
+                    enemigo.vida = vida_enemigo_antes
+                    mi_pokemon.defensa = defensa_antes
+                    mi_pokemon.vida = vida_antes
+
+                    input("Presiona [ENTER] para regresar al menú.")
                 return
 
         accion = random.choice(["pasar", "normal", "especial", "huir"])
@@ -401,14 +447,24 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
                   f"Vida reducida: {dano_vida}")
 
         elif accion == "especial":
-            dano = 25
-            mi_pokemon.vida = max(0, mi_pokemon.vida - dano)
+            aplicar_danio_especial(enemigo, mi_pokemon)
+
+            dano_defensa = max(0, defensa_antes - mi_pokemon.defensa)
+            dano_vida = max(0, vida_antes - mi_pokemon.vida)
+            dano_total = dano_defensa + dano_vida
 
             print(f"\n{enemigo.nombre} usó {enemigo.ataque_especial}\n"
-                  f"Daño total: {dano}")
+                  f"Daño total: {dano_total}\n"
+                  f"Defensa reducida: {dano_defensa}\n"
+                  f"Vida reducida: {dano_vida}")
 
         elif accion == "huir":
             print(f"\n{enemigo.nombre} huyó del combate\n")
+            enemigo.defensa = defensa_enemigo_antes
+            enemigo.vida = vida_enemigo_antes
+            mi_pokemon.defensa = defensa_antes
+            mi_pokemon.vida = vida_antes
+
             return
 
         if mi_pokemon.vida <= 0:
@@ -418,8 +474,12 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
                 "Despues de recibir atencion, ha vuelto a la normalidad y esta listo para regresar al campo.\n"
             )
 
-            input("Presiona ENTER para continuar...")
+            enemigo.defensa = defensa_enemigo_antes
+            enemigo.vida = vida_enemigo_antes
+            mi_pokemon.defensa = defensa_antes
+            mi_pokemon.vida = vida_antes
 
+            input("Presiona [ENTER] para regresar al menú.")
             return
 
 
@@ -514,9 +574,11 @@ while True:
 
     if opcion == "1":
         pokemon_principal.detallesPokemon()
+        input("Presiona [ENTER] para regresar.")
 
     elif opcion == "2":
         pokemon_principal.hablar()
+        input("Presiona [ENTER] para regresar.")
 
     elif opcion == "3":
         pokemon_principal.entrenar()
@@ -526,9 +588,11 @@ while True:
 
     elif opcion == "5":
         verPokemonsAtrapados(pokemones_atrapados, pokemon_principal)
+        input("Presiona [ENTER] para regresar.")
 
     elif opcion == "6":
         enemigos.append(crear_enemigo())
+        input("Presionar [ENTER] para regresar.")
 
     elif opcion == "7":
         print("\nCargando", end="")
