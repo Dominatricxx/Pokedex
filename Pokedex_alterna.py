@@ -46,7 +46,6 @@ class PokemonBase(ABC):
     def entrenar(self):
         pass
 
-
 class Entrenamiento(ABC):
     @abstractmethod
     def subirAtaque(self):
@@ -60,7 +59,6 @@ class Entrenamiento(ABC):
     def subirVida(self):
         pass
 
-
 class Pokemon(PokemonBase):
     def __init__(self, nombre, descripcion):
         super().__init__()
@@ -69,7 +67,7 @@ class Pokemon(PokemonBase):
         self.ataque = 50
         self.defensa = 50
         self.vida = 50
-        self.nivel = 0
+        self.nivel = 1
         self.evolucion = 1
         self.atrapado = True
 
@@ -83,7 +81,7 @@ class Pokemon(PokemonBase):
                 if self.nivel >= 100 and indice < len(linea) - 1:
                     self.nombre = linea[indice + 1]
                     self.evolucion += 1
-                    self.nivel = 0
+                    self.nivel = 1
 
                     print(f"\n¡El Pokémon ha evolucionado! Ahora es: {self.nombre}\n")
 
@@ -151,13 +149,11 @@ class Pokemon(PokemonBase):
                 elif eleccion == "3":
                     self.vida += 10
 
-
             elif opcion == "3":
 
                 self.subirAtaque()
                 self.subirDefensa()
                 self.subirVida()
-
 
             elif opcion == "4":
 
@@ -189,7 +185,6 @@ class Pokemon(PokemonBase):
 
                     elif eleccion == "5":
                         break
-
 
             elif opcion == "5":
                 print()
@@ -243,7 +238,6 @@ class Pokemon(PokemonBase):
             input("Presiona [Enter] para regresar al menú de entrenamientos.")
             self.detallesPokemon()
 
-
     def subirAtaque(self):
         self.ataque += 20
 
@@ -256,7 +250,6 @@ class Pokemon(PokemonBase):
 
 class PokemonConEntrenamiento(Pokemon, Entrenamiento):
     pass
-
 
 class PokemonAgua(PokemonConEntrenamiento):
     def __init__(self, nombre):
@@ -273,7 +266,6 @@ class PokemonAgua(PokemonConEntrenamiento):
             self.vida += 10
 
         super().actualizar()
-
 
 class PokemonFuego(PokemonConEntrenamiento):
     def __init__(self, nombre):
@@ -509,14 +501,12 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
             input("Presiona [ENTER] para regresar al menú.")
             return
 
-
 def verPokemonsAtrapados(lista, principal):
     print("\nPOKEMONES DISPONIBLES\n")
     principal.detallesPokemon()
 
     for p in lista:
         p.detallesPokemon()
-
 
 def crear_enemigo():
     print(
@@ -579,7 +569,7 @@ input("Presiona [ENTER] para continuar al menú principal...")
 
 enemigos = [
     PokemonFuego("Charmander"),
-    PokemonAgua("Magikarp"),
+    PokemonAgua("Squirtle"),
     PokemonElectrico("Pichu"),
     PokemonHierba("Bulbasaur"),
 ]
