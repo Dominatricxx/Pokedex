@@ -62,8 +62,8 @@ class Pokemon(PokemonBase):
         super().__init__()
         self.nombre = nombre
         self.descripcion = descripcion
-        self.ataque = 50
-        self.defensa = 50
+        self.ataque = 0
+        self.defensa = 0
         self.vida = 50
         self.nivel = 1
         self.evolucion = 1
@@ -73,6 +73,7 @@ class Pokemon(PokemonBase):
         self.ataque = min(self.ataque, 1000)
         self.defensa = min(self.defensa, 1000)
         self.vida = min(self.vida, 1000)
+        self.nivel = min(self.nivel, 100)
 
     def hablar(self):
         print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!\n")
@@ -87,7 +88,8 @@ class Pokemon(PokemonBase):
                     self.evolucion += 1
                     self.nivel = 1
                     print(f"\n¡El Pokémon ha evolucionado! Ahora es: {self.nombre}\n")
-                elif self.nivel >= 100 and indice == len(linea) - 1:
+
+                elif self.nivel == 100 and indice == len(linea) - 1:
                     print(f"\n¡{self.nombre} ha alcanzado su máximo nivel!\n")
                 break
 
@@ -252,6 +254,7 @@ class Pokemon(PokemonBase):
         self.vida += 20
         self.limitar_stats()
 
+
 class PokemonConEntrenamiento(Pokemon, Entrenamiento):
     pass
 
@@ -384,8 +387,6 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
             print(f"\n{mi_pokemon.nombre} decidió pasar turno")
 
         elif opcion == "2":
-            defensa_antes = enemigo.defensa
-            vida_antes = enemigo.vida
 
             aplicar_danio(mi_pokemon, enemigo)
 
@@ -424,15 +425,18 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
         if enemigo.vida <= 0:
             print(f"\n{enemigo.nombre} fue derrotado\n")
 
-            mi_pokemon.nivel += 2
             enemigo.defensa = defensa_enemigo_antes
             enemigo.vida = vida_enemigo_antes
             mi_pokemon.defensa = defensa_antes
             mi_pokemon.vida = vida_antes
 
-            print(f"===== ¡Felicidades! tu pokemon a subido al nivel {mi_pokemon.nivel} =====\n\n"
+            if mi_pokemon.nivel == 100:
+                print(f"===== Tu pokemon ha alcanzado el nivel máximo =====\n")
+            else:
+                mi_pokemon.nivel += 2
+                print(f"===== ¡Felicidades! tu pokemon a subido al nivel {mi_pokemon.nivel} =====\n")
 
-                  f"¿Desea capturar al pokemon {enemigo.nombre}?\n"
+            print(f"¿Desea capturar al pokemon {enemigo.nombre}?\n"
                   f"[1] Sí\n"
                   f"[2] No\n")
 
@@ -452,19 +456,9 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
                     atrapados.append(enemigo)
                     print(f"\n{enemigo.nombre} fue atrapado.\n")
 
-                    enemigo.defensa = defensa_enemigo_antes
-                    enemigo.vida = vida_enemigo_antes
-                    mi_pokemon.defensa = defensa_antes
-                    mi_pokemon.vida = vida_antes
-
                     input("Presiona [ENTER] para regresar al menú.")
                 else:
                     print(f"\nEl pokemon {enemigo.nombre} no pudo ser capturado y escapó.\n")
-
-                    enemigo.defensa = defensa_enemigo_antes
-                    enemigo.vida = vida_enemigo_antes
-                    mi_pokemon.defensa = defensa_antes
-                    mi_pokemon.vida = vida_antes
 
                     input("Presiona [ENTER] para regresar al menú.")
                 return
@@ -475,9 +469,6 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
             print(f"\n{enemigo.nombre} decidió pasar turno")
 
         elif accion == "normal":
-            defensa_antes = mi_pokemon.defensa
-            vida_antes = mi_pokemon.vida
-
             aplicar_danio(enemigo, mi_pokemon)
 
             dano_defensa = defensa_mi_turno - mi_pokemon.defensa
@@ -508,6 +499,7 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
             mi_pokemon.defensa = defensa_antes
             mi_pokemon.vida = vida_antes
 
+            input("Presiona [ENTER] para regresar al menú.")
             return
 
         if mi_pokemon.vida <= 0:
@@ -612,7 +604,6 @@ while True:
         "6. Crear Pokémon Enemigo\n"
         "7. Salir\n"
     )
-
     opcion = input("Elige: ")
 
     if opcion == "1":
