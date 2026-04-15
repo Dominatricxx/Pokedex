@@ -70,7 +70,7 @@ class Pokemon(PokemonBase):
         self.atrapado = True
 
     def hablar(self):
-        print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!")
+        print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!\n")
 
     def actualizar(self):
         for linea in lineas_evolutivas:
@@ -230,7 +230,7 @@ class Pokemon(PokemonBase):
                 print(f"Nivel: {nivel_antes} → {self.nivel} (+{self.nivel})")
 
             print("========================================\n")
-            input("Presiona [Enter] para regresar al menú de entrenamientos.")
+            input("Presiona [ENTER] para regresar al menú de entrenamientos.")
             self.detallesPokemon()
 
     def subirAtaque(self):
@@ -547,7 +547,7 @@ else:
     pokemon_principal = PokemonHierba("Bulbasaur")
 
 pokemon_principal.detallesPokemon()
-input("Presiona ENTER para continuar al menú principal...")
+input("Presiona [ENTER] para continuar al menú principal...")
 
 enemigos = [
     PokemonFuego("Charmander"),
