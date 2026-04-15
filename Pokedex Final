@@ -65,21 +65,27 @@ class Pokemon(PokemonBase):
         self.ataque = 50
         self.defensa = 50
         self.vida = 50
-        self.nivel = 0
+        self.nivel = 1
         self.evolucion = 1
         self.atrapado = True
+
+    def limitar_stats(self):
+        self.ataque = min(self.ataque, 1000)
+        self.defensa = min(self.defensa, 1000)
+        self.vida = min(self.vida, 1000)
 
     def hablar(self):
         print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!\n")
 
     def actualizar(self):
+        self.limitar_stats()
         for linea in lineas_evolutivas:
             if self.nombre in linea:
                 indice = linea.index(self.nombre)
                 if self.nivel >= 100 and indice < len(linea) - 1:
                     self.nombre = linea[indice + 1]
                     self.evolucion += 1
-                    self.nivel = 0
+                    self.nivel = 1
                     print(f"\n¡El Pokémon ha evolucionado! Ahora es: {self.nombre}\n")
                 elif self.nivel >= 100 and indice == len(linea) - 1:
                     print(f"\n¡{self.nombre} ha alcanzado su máximo nivel!\n")
@@ -186,6 +192,7 @@ class Pokemon(PokemonBase):
             elif opcion == "5":
                 break
 
+            self.limitar_stats()
             self.actualizar()
 
             print("\n===== RESULTADOS DEL ENTRENAMIENTO =====")
@@ -235,13 +242,15 @@ class Pokemon(PokemonBase):
 
     def subirAtaque(self):
         self.ataque += 20
+        self.limitar_stats()
 
     def subirDefensa(self):
         self.defensa += 20
+        self.limitar_stats()
 
     def subirVida(self):
         self.vida += 20
-
+        self.limitar_stats()
 
 class PokemonConEntrenamiento(Pokemon, Entrenamiento):
     pass
