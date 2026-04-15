@@ -304,10 +304,14 @@ def aplicar_danio(atacante, defensor):
         defensor.vida = max(0, defensor.vida - restante)
 
 
-def combate(mi_pokemon, enemigos, atrapados):
+def combate(mi_pokemon, enemigos, atrapados, nombre_usuario):
+
+    print(f"\n{nombre_usuario}: ¡{mi_pokemon.nombre} yo te elijo!\n")
+
     enemigo = random.choice(enemigos)
 
-    print(f"\nCombate iniciado contra {enemigo.nombre}")
+    print(f"Entrenador rival: ¡{enemigo.nombre}, adelante!\n"
+          f"\nCombate iniciado contra {enemigo.nombre}\n")
 
     while mi_pokemon.vida > 0 and enemigo.vida > 0:
         print(
@@ -455,6 +459,13 @@ def crear_enemigo():
     return p
 
 
+print("\n===== BIENVENIDO ENTRENADOR =====\n")
+nombre_usuario = input("Por favor, ingresa tu nombre: ")
+
+print(f"\nBienvenido {nombre_usuario}.\n"
+      f"Actualmente no tienes ningun pokemon en tu posesion.\n")
+input("Por favor procede con [ENTER] para seleccionar uno.")
+
 print(
     "\n¡BIENVENIDO A LA POKEDEX!\n"
     "\n===== Elige tu Pokémon inicial =====\n\n"
@@ -474,6 +485,9 @@ elif op == "3":
     pokemon_principal = PokemonElectrico("Pichu")
 else:
     pokemon_principal = PokemonHierba("Bulbasaur")
+
+pokemon_principal.detallesPokemon()
+input("Presiona ENTER para continuar al menú principal...")
 
 enemigos = [
     PokemonFuego("Charmander"),
@@ -508,7 +522,7 @@ while True:
         pokemon_principal.entrenar()
 
     elif opcion == "4":
-        combate(pokemon_principal, enemigos, pokemones_atrapados)
+        combate(pokemon_principal, enemigos, pokemones_atrapados, nombre_usuario)
 
     elif opcion == "5":
         verPokemonsAtrapados(pokemones_atrapados, pokemon_principal)
