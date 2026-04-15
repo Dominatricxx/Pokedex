@@ -64,17 +64,24 @@ class Pokemon(PokemonBase):
         super().__init__()
         self.nombre = nombre
         self.descripcion = descripcion
-        self.ataque = 50
-        self.defensa = 50
+        self.ataque = 0
+        self.defensa = 0
         self.vida = 50
         self.nivel = 1
         self.evolucion = 1
         self.atrapado = True
 
+    def limitar_stats(self):
+        self.ataque = min(self.ataque, 1000)
+        self.defensa = min(self.defensa, 1000)
+        self.vida = min(self.vida, 1000)
+        self.nivel = min(self.nivel, 100)
+
     def hablar(self):
         print(f"\n{self.nombre} dice: ¡¡{self.nombre}!!")
 
     def actualizar(self):
+        self.limitar_stats()
         for linea in lineas_evolutivas:
             if self.nombre in linea:
                 indice = linea.index(self.nombre)
@@ -88,6 +95,7 @@ class Pokemon(PokemonBase):
                 elif self.nivel == 100 and indice == len(linea) - 1:
                     print(f"\n¡{self.nombre} ha alcanzado su máximo nivel!\n")
                 break
+    
 
     def detallesPokemon(self):
         print(
@@ -189,7 +197,8 @@ class Pokemon(PokemonBase):
             elif opcion == "5":
                 print()
                 break
-
+            
+            self.limitar_stats()
             self.actualizar()
 
             print("===== RESULTADOS DEL ENTRENAMIENTO =====")
@@ -240,12 +249,15 @@ class Pokemon(PokemonBase):
 
     def subirAtaque(self):
         self.ataque += 20
+        self.limitar_stats()
 
     def subirDefensa(self):
         self.defensa += 20
+        self.limitar_stats()
 
     def subirVida(self):
         self.vida += 20
+        self.limitar_stats()
 
 
 class PokemonConEntrenamiento(Pokemon, Entrenamiento):
@@ -413,15 +425,18 @@ def combate(mi_pokemon, enemigos, atrapados, nombre_usuario, rivales):
         if enemigo.vida <= 0:
             print(f"\n{enemigo.nombre} fue derrotado\n")
 
-            mi_pokemon.nivel += 2
             enemigo.defensa = defensa_enemigo_antes
             enemigo.vida = vida_enemigo_antes
             mi_pokemon.defensa = defensa_antes
             mi_pokemon.vida = vida_antes
             
-            print(f"===== ¡Felicidades! tu pokemon a subido al nivel {mi_pokemon.nivel} =====\n\n"
+            if mi_pokemon.nivel == 100:
+                print(f"===== Tu pokemon ha alcanzado el nivel máximo =====\n")
+            else:
+                mi_pokemon.nivel += 2
+                print(f"===== ¡Felicidades! tu pokemon a subido al nivel {mi_pokemon.nivel} =====\n")
 
-                  f"¿Desea capturar al pokemon {enemigo.nombre}?\n"
+            print(f"¿Desea capturar al pokemon {enemigo.nombre}?\n"
                   f"[1] Sí\n"
                   f"[2] No\n")
 
