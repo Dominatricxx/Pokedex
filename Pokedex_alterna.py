@@ -545,8 +545,13 @@ def crear_enemigo():
         p = PokemonHierba(nombre)
 
     p.ataque = int(input("Ataque: "))
+    p.ataque = min(p.ataque, 1000)
+
     p.defensa = int(input("Defensa: "))
+    p.defensa = min(p.defensa, 1000)
+
     p.vida = int(input("Vida: "))
+    p.vida = min(p.vida, 1000)
 
     return p
 
