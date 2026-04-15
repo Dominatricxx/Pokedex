@@ -270,6 +270,10 @@ class PokemonAgua(PokemonConEntrenamiento):
 
         super().actualizar()
 
+     
+          
+
+
 class PokemonFuego(PokemonConEntrenamiento):
     def __init__(self, nombre):
         super().__init__(nombre, "Tipo Fuego")
@@ -418,7 +422,7 @@ def combate(mi_pokemon, enemigos, atrapados):
                     mi_pokemon.defensa = defensa_antes
                     mi_pokemon.vida = vida_antes
 
-                    input(" Presiona [ENTER] para regresar al menú.")
+                    input("Presiona [ENTER] para regresar al menú.")
                 else:
                     print(f"\nEl pokemon {enemigo.nombre} no pudo ser capturado y escapó.\n")
 
